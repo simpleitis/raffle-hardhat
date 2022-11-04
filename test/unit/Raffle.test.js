@@ -5,11 +5,12 @@ const { developmentChains, networkConfig } = require("../../helper-hardhat-confi
 !developmentChains.includes(network.name)
     ? describe.skip
     : describe("Raffle Unit Tests", function () {
-          let raffle, vrfCoordinatorV2Mock, raffleEntranceFee, interval, deployer // , deployer
+          let raffle, vrfCoordinatorV2Mock, raffleEntranceFee, interval, deployer
 
           beforeEach(async () => {
               deployer = (await getNamedAccounts()).deployer
-              await deployments.fixture(["all"]) // Deploys modules with the tags "mocks" and "raffle"
+              // run all the files inside 'deploy' folder
+              await deployments.fixture(["all"])
               raffle = await ethers.getContract("Raffle", deployer)
               vrfCoordinatorV2Mock = await ethers.getContract("VRFCoordinatorV2Mock", deployer)
               interval = await raffle.getInterval()
@@ -52,8 +53,9 @@ const { developmentChains, networkConfig } = require("../../helper-hardhat-confi
 
               it("dosen't allow entrance when raffle is calculating", async function () {
                   await raffle.enterRaffle({ value: raffleEntranceFee })
+                  // 'evm_increseTime' is used to increase the time of our local blockchain
                   await network.provider.send("evm_increaseTime", [interval.toNumber() + 1])
-                  // [] signifies we want to mine a single block
+                  // 'evm_mine' is used to mine a new blocks and [] signifies we want to mine a single block and we do this because we are reading the timestamp off of blocks and we would need a new block to store the new timestamp which we updated in the above statement
                   await network.provider.send("evm_mine", [])
                   // we are pretending to be chainlink keepers, as we have made 'checkUpkeep' to return true
                   // performUpkeep require some callData in the form of bytes
@@ -89,7 +91,9 @@ const { developmentChains, networkConfig } = require("../../helper-hardhat-confi
                   await raffle.enterRaffle({ value: raffleEntranceFee })
                   await network.provider.send("evm_increaseTime", [interval.toNumber() - 5]) // use a higher number here if this test fails
                   await network.provider.request({ method: "evm_mine", params: [] })
-                  const { upkeepNeeded } = await raffle.callStatic.checkUpkeep("0x") // upkeepNeeded = (timePassed && isOpen && hasBalance && hasPlayers)
+                  // '0x' and [] are used to represent empty byte objectd
+                  // upkeepNeeded = (timePassed && isOpen && hasBalance && hasPlayers)
+                  const { upkeepNeeded } = await raffle.callStatic.checkUpkeep("0x")
                   assert(!upkeepNeeded)
               })
 
@@ -97,7 +101,8 @@ const { developmentChains, networkConfig } = require("../../helper-hardhat-confi
                   await raffle.enterRaffle({ value: raffleEntranceFee })
                   await network.provider.send("evm_increaseTime", [interval.toNumber() + 1])
                   await network.provider.request({ method: "evm_mine", params: [] })
-                  const { upkeepNeeded } = await raffle.callStatic.checkUpkeep("0x") // upkeepNeeded = (timePassed && isOpen && hasBalance && hasPlayers)
+                  // upkeepNeeded = (timePassed && isOpen && hasBalance && hasPlayers)
+                  const { upkeepNeeded } = await raffle.callStatic.checkUpkeep("0x")
                   assert(upkeepNeeded)
               })
           })
@@ -107,6 +112,7 @@ const { developmentChains, networkConfig } = require("../../helper-hardhat-confi
                   await raffle.enterRaffle({ value: raffleEntranceFee })
                   await network.provider.send("evm_increaseTime", [interval.toNumber() + 1])
                   await network.provider.send("evm_mine", [])
+                  // if 'await raffle.performUpKeep' fails or reverts then the below assert would fail and that is how we can make sure 'performUpKeep' only run when 'checkupkeep' is true
                   const tx = await raffle.performUpkeep([])
                   assert(tx)
               })
@@ -138,7 +144,7 @@ const { developmentChains, networkConfig } = require("../../helper-hardhat-confi
                   await network.provider.send("evm_mine", [])
               })
 
-              // it can only be called if there is a valid requestId
+              // it can only be called if there is a valid requestId and requestId is generated inside the 'performUpkeep' function
               it("can only be called after performUpkeep", async function () {
                   await expect(
                       vrfCoordinatorV2Mock.fulfillRandomWords(0, raffle.address)

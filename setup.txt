@@ -33,7 +33,7 @@ Brainstorming
 
 Just after creating the skeleton of the contract run 'yarn hardhat compile' to check if it is compiling properly
 
-If we are using chainlink services we need to run 'yarn add --dev @chainlink/contracts' so that we can download the .sol files from github directly to our contract
+If we are using chainlink services we need to run 'yarn add --dev @chainlink/contracts' so that we can download the .sol files from github directly to our contract(Note: 'yarn add --dev @chainlink/contracts@0.4.0' is used to fix an error caused by 'yarn add --dev @chainlink/contracts')
 
 Instead of writing long commands like 'yarn hardhat .....' we can use the 'hardhat-shorthand' package by running 'yarn global add hardhat-shorthand'. Now instead of running commands like 'yarn hardhat compile' we can run 'hh compile'
 
@@ -45,7 +45,7 @@ Create a 'test' folder in 'contracts' folder and create the mock files there
 
 Create new folder 'utils' and inside it create 'verify.js'
 
-Create folder 'test' and create 'Raffle.test.js'
+Create folder 'test' and create 'unit' and 'stagging' folders and then create 'Raffle.test.js' inside 'unit' and 'Raffle.staging.test.js' in 'stagging' folder
 
 To run only specific 'it' blocks we can use 'hh test --grep "keyword(s)" 
 
