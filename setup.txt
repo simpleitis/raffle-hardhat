@@ -1,0 +1,63 @@
+yarn add --dev hardhat
+
+yarn hardhat
+
+create sample javascript project 
+
+yarn add --dev @nomiclabs/hardhat-ethers@npm:hardhat-deploy-ethers ethers @nomiclabs/hardhat-etherscan @nomiclabs/hardhat-waffle chai ethereum-waffle hardhat hardhat-contract-sizer hardhat-deploy hardhat-gas-reporter prettier prettier-plugin-solidity solhint solidity-coverage dotenv @chainlink/contracts@0.4.0
+
+copy paste below lines to hardhat.config.js
+require("@nomiclabs/hardhat-waffle")
+require("@nomiclabs/hardhat-etherscan")
+require("hardhat-deploy")
+require("solidity-coverage")
+require("hardhat-gas-reporter")
+require("hardhat-contract-sizer")
+require("dotenv").config()
+
+copy paste below line to .prettierrc
+{
+  "tabWidth": 4,
+  "useTabs": false,
+  "semi": false,
+  "singleQuote": false,
+  "printWidth": 100
+}
+
+Brainstorming
+1)User should be able to enter raffle by paying a min amount
+2)Contract should pick a random winner
+3)Winner should be picked every x minute
+4)Chain link has to be used for random number and automated winner picking(chain link keepers)
+
+
+Just after creating the skeleton of the contract run 'yarn hardhat compile' to check if it is compiling properly
+
+If we are using chainlink services we need to run 'yarn add --dev @chainlink/contracts' so that we can download the .sol files from github directly to our contract
+
+Instead of writing long commands like 'yarn hardhat .....' we can use the 'hardhat-shorthand' package by running 'yarn global add hardhat-shorthand'. Now instead of running commands like 'yarn hardhat compile' we can run 'hh compile'
+
+After writing the smart contract(s) and compiling them, create a deploy folder and create '01-deploy-raffle.js'. Also make all the neccessary updates in 'hardhat.config.js' and '.env' file for the deploy scripts to work properly
+
+Create 'helper-hardhat-config.js' and enter the details of the external contract used in the contract
+
+Create a 'test' folder in 'contracts' folder and create the mock files there
+
+Create new folder 'utils' and inside it create 'verify.js'
+
+Create folder 'test' and create 'Raffle.test.js'
+
+To run only specific 'it' blocks we can use 'hh test --grep "keyword(s)" 
+
+'hh coverage' can be used to check the coverage of tests
+
+if 'toNumber()' does not work then use 'toString()' inside assert statements
+
+in 'hardhat.config' we can add a 'timeout' to prevent a failed transaction to result in a promise which does not get resolved or rejected
+
+TO RUN STAGING tests
+1) Get subId for chainlink verify and fund it
+2) Deploy our contract using the subId
+3) Register the contract with chainlink vrf and it's subId
+4) Register the contract with chainlink keepers
+5) Run staging tests (hh test --network goerli)
