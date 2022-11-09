@@ -61,3 +61,9 @@ TO RUN STAGING tests
 3) Register the contract with chainlink vrf and it's subId
 4) Register the contract with chainlink keepers
 5) Run staging tests (hh test --network goerli)
+
+Create new file inside 'deploy' folder called '99-update-front-end.js' to make the fronend always compatible even when some of the backend code changes like changing from local chain to test net and we use 99 to make it the last file to execute in our deploy folder
+
+Create new variable called 'UPDATE_FRONT_END' in .env file to set if '99-update-front-end.js' should be run
+
+Whenever you create a new subscription, you need to update the ID and the vrfCoordinator address in 'helper-hardhat-config' and deploy a new contract and then you need to add it as a subscriber to the vrf
